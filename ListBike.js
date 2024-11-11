@@ -19,34 +19,46 @@ import AssetExample from './components/AssetExample';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect } from 'react';
 export default function ListBike({navigation}) {
-  const [bikes, setBikes] = useState([]);
+   const [bikes, setBikes] = useState([]);
 
-  // Fetch or simulate API data
+  // Local image data to match with API data
+  const bikeImages = {
+    '1': require('./assets/1.png'),
+    '2': require('./assets/2.png'),
+    '3': require('./assets/3.png'),
+    '4': require('./assets/4.png'),
+    '5': require('./assets/5.png'),
+    '6': require('./assets/6.png'),
+  };
+
   useEffect(() => {
     fetchBikes();
   }, []);
 
   const fetchBikes = async () => {
-    // Replace with actual API call if available
-    const bikeData = [
-      { id: '1', name: 'Pinarello', price: 1800, image: require("./assets/1.png") },
-      { id: '2', name: 'Pina Mountai', price: 1350, image: require("./assets/2.png") },
-      { id: '3', name: 'Pina Bike', price: 1500, image: require("./assets/3.png")  },
-      { id: '4', name: 'Pinarello', price: 1900, image: require("./assets/4.png")  },
-      { id: '5', name: 'Pinarello', price: 2700, image: require("./assets/5.png")  },
-      { id: '5', name: 'Pinarello', price: 2700, image: require("./assets/6.png")  },
-    ];
-    setBikes(bikeData);
+    try {
+      const response = await fetch('https://6731ce417aaf2a9aff12326d.mockapi.io/bao');
+      
+      const data = await response.json();
+      const mappedData = data.map((item) => ({
+        ...item,
+        image: bikeImages[item.id] || bikeImages['1'], // Fallback to image 1 if ID not found
+      }));
+      setBikes(mappedData);
+    } catch (error) {
+      console.error("Error fetching bikes data:", error);
+    }
   };
 
   // Render each bike item
   const renderItem = ({ item }) => (
     <View style={style.card}>
-      <Image source={item.image} style={style.image}/>
+      <Image source={item.image} style={style.image} />
       <Text style={style.name}>{item.name}</Text>
       <Text style={style.price}>${item.price}</Text>
     </View>
   );
+
 
   return(
     <SafeAreaView style={style.container}>
@@ -103,6 +115,6 @@ const style=StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    color: '#888',
-  },
-})
+    color: '#888'
+  }
+}) 
